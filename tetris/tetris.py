@@ -36,7 +36,7 @@ def leftArrow(args):
 def rightArrow(args): 
     if len(squares) >0:
         s = squares[-1]
-        if s.index[0]+1 < groundWidth:
+        if s.index[0]+1 < groundWidth-1:
             for sq in squares[-offset:]:
                 sq.x += sq.size
                 sq.index[0] += 1
@@ -174,9 +174,10 @@ def timerTick():
             wasCollision = False
             for s in squares[-offset:]:
                 if s.index[1]+1 == groundHeight or ground[s.index[1]+1][s.index[0]]:
-                    ground[s.index[1]][s.index[0]] = True
                     wasCollision = True
             if wasCollision:
+                for s in squares[-offset:]:
+                    ground[s.index[1]][s.index[0]] = True
                 buttonPressed()
             else: 
                 for s in squares[-offset:]:
