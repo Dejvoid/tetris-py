@@ -46,8 +46,9 @@ def rightArrow(args):
 def downArrow(args): 
     return 
 
-def rotate(args): 
-    return 
+def upArrow(args): 
+    global brickType
+    rotate(brickType) 
 ###
 
 ###
@@ -156,7 +157,11 @@ def rotate(brickType):
 def buttonPressed(): 
     global offset
     global nextBrick
+    global rotStatus
+    global brickType
+    rotStatus = 0
     # if ground contains full line -> delete squares in line
+    brickType = nextBrick
     brickSq, offset = generate(nextBrick)
     nextBrick = random.randint(1,7)
     for s in brickSq:
@@ -195,7 +200,7 @@ canvas = Canvas(form, width=500, height = 500)
 form.bind("<Left>", leftArrow)
 form.bind("<Right>", rightArrow)
 form.bind("<Down>",downArrow)
-form.bind("<Up>", rotate)
+form.bind("<Up>", upArrow)
 canvas.pack()
 squares = []
 t = threading.Timer(0.5,timerTick)
@@ -203,5 +208,6 @@ t = threading.Thread(None, timerTick)
 #t.run()
 t.start()
 nextBrick = random.randint(1,7)
+brickType = nextBrick
 rotStatus = 0
 form.mainloop()
