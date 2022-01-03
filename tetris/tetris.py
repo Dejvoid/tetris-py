@@ -36,7 +36,7 @@ def leftArrow(args):
 def rightArrow(args): 
     if len(squares) >0:
         s = squares[-1]
-        if s.index[0]+1 < groundWidth-1:
+        if s.index[0]+1 < groundWidth:
             for sq in squares[-offset:]:
                 sq.x += sq.size
                 sq.index[0] += 1
@@ -65,32 +65,32 @@ def redraw():
             canvas.create_rectangle(sq.x,sq.y,sq.x+sq.size,sq.y+sq.size, fill = "red")
     canvas.update()
    
-#   ##### - TYPE 1
+#   0123 - TYPE 1
 #
-#   ### - TYPE 2
-#     #
+#   012 - TYPE 2
+#     3
 #
-#   ### - TYPE 3
-#    #
+#   012 - TYPE 3
+#    3
 #
-#   ## - TYPE 4
-#   ##
+#   01 - TYPE 4
+#   23
 #
-#     # - TYPE 5
-#   ###
+#   123 - TYPE 5
+#   4
 #
-#   ## - TYPE 6
-#    ##
+#   01 - TYPE 6
+#    23
 #
-#    ## - TYPE 7
-#   ##    
+#    13 - TYPE 7
+#   02    
 
 ###
 # SwitcherMethods
 ###
 
 def createOne():
-    return [Square(10,10,10),Square(20,10,10),Square(30,10,10),Square(40,10,10),Square(50,10,10)] 
+    return [Square(10,10,10),Square(20,10,10),Square(30,10,10),Square(40,10,10)] 
 def createTwo(): 
     return [Square(10,10,10), Square(20,10,10), Square(30,10,10), Square(30,20,10)]
 def createThree(): 
@@ -102,22 +102,82 @@ def createFive():
 def createSix(): 
     return [Square(10,10,10), Square(20,10,10), Square(20,20,10), Square(30,20,10)] 
 def createSeven(): 
-    return [Square(10,10,10), Square(20,10,10), Square(20,20,10), Square(10,20,10)]
+    return [Square(10,20,10), Square(20,10,10), Square(20,20,10), Square(30,10,10)]
 
-def rotateOne(status): 
-    return 
-def rotateTwo(status): 
-    return 
-def rotateThree(status): 
-    return 
-def rotateFour(status): 
-    return 
-def rotateFive(status): 
-    return 
-def rotateSix(status): 
-    return 
-def rotateSeven(status): 
-    return 
+def rotateOne(status, block): 
+    if status % 2 ==0:
+        block[0].x -= block[3].size
+        block[0].y -= block[3].size
+        block[1] = block[1]
+        block[2].x += block[2].size
+        block[2].y += block[2].size
+        block[3].x += block[2].size * 2
+        block[3].y -= block[2].size * 2
+    else: 
+        block[0].x += block[3].size
+        block[0].y += block[3].size
+        block[1] = block[1]
+        block[2].x -= block[2].size
+        block[2].y -= block[2].size
+        block[3].x -= block[2].size * 2
+        block[3].y += block[2].size * 2
+
+def rotateTwo(status, block): 
+    size = block[0].size
+    if status == 0:
+        block[3].x -= size * 2
+        block[2].x -= size
+        block[2].y += size
+        block[0].x -= size
+        block[0].y += size
+    elif status ==1: 
+        block[3].y -= size * 2
+        block[2].x -= size
+        block[2].y -= size
+        block[0].x += size
+        block[0].y += size 
+    elif status == 2: 
+        block[3].x += size * 2
+        block[2].x += size
+        block[2].y += size
+        block[0].x -= size
+        block[0].y += size  
+    else: 
+        block[3].y += size * 2
+        block[2].x += size
+        block[2].y += size
+        block[0].x -= size
+        block[0].y -= size 
+def rotateThree(status, block): 
+    if status == 0:
+        pass
+    elif status ==1: 
+        pass 
+    elif status == 2: 
+        pass 
+    else: 
+        pass
+def rotateFour(status, block): 
+    return
+def rotateFive(status, block): 
+    if status == 0:
+        pass
+    elif status ==1: 
+        pass 
+    elif status == 2: 
+        pass 
+    else: 
+        pass
+def rotateSix(status, block): 
+    if status % 2 ==0:
+        pass
+    else: 
+       pass 
+def rotateSeven(status, block): 
+    if status % 2 ==0:
+        pass
+    else: 
+        pass
 ### 
 
 def generate(brickType): 
@@ -147,11 +207,11 @@ def rotate(brickType):
         7: rotateSeven
         }
     newSq = switcher.get(brickType, lambda: "invalid")
-    #squares[-offset:]  = newSq(rotStatus)
-    if rotStatus < 4:
-        rotStatus += 1
-    else: 
+    rotStatus += 1
+    if rotStatus >= 4:
         rotStatus = 0
+    newSq(rotStatus, squares[-offset:])
+    
 
 
 def buttonPressed(): 
@@ -208,7 +268,7 @@ t = threading.Timer(0.5,timerTick)
 t = threading.Thread(None, timerTick)
 #t.run()
 t.start()
+brickType = random.randint(1,7)
 nextBrick = random.randint(1,7)
-brickType = nextBrick
 rotStatus = 0
 form.mainloop()
