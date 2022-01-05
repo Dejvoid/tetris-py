@@ -4,15 +4,6 @@ import random
 import time 
 import threading
 
-#class BrickType(Enum): 
-#    TYPE1 = 1 
-#    TYPE2 = 2 
-#    TYPE3 = 3 
-#    TYPE4 = 4 
-#    TYPE5 = 5
-#    TYPE6 = 7
-#    TYPE7 = 7
-
 
 class Square: 
     def __init__(self, x, y,size) -> None:
@@ -20,35 +11,51 @@ class Square:
         self.y = y 
         self.size = size
         self.index = [x//size-1,y//size-1]
+    def recalculateIndex(self): 
+        self.index = [self.x//self.size-1,self.y//self.size-1]
 ### 
 # Control Methods
 ###
 def leftArrow(args): 
+    wasCollision = False
     if len(squares) >0:
-        s = squares[-offset]
-        if s.index[0]-1 >= 0:
-            for sq in squares[-offset:]:
-                sq.x -= sq.size
-                sq.index[0] -= 1
-    canvas.delete("all")
+        for i in range(-offset,0):
+            s = squares[i]
+            if s.index[0]-1 < 0 or ground[s.index[1]][s.index[0]-1]:
+                wasCollision = True
+        if not wasCollision:
+            for i in range(-offset,0):
+                squares[i].x -= squares[i].size
+                squares[i].index[0] -= 1
     redraw()
 
 def rightArrow(args): 
+    wasCollision = False
     if len(squares) >0:
-        s = squares[-1]
-        if s.index[0]+1 < groundWidth:
-            for sq in squares[-offset:]:
-                sq.x += sq.size
-                sq.index[0] += 1
-    canvas.delete("all")
+        for i in range(-offset,0):
+            s = squares[i]
+            if s.index[0]+1 >= groundWidth or ground[s.index[1]][s.index[0]+1]:
+                wasCollision = True
+        if not wasCollision:
+            for i in range(-offset,0):
+                squares[i].x += squares[i].size
+                squares[i].index[0] += 1
     redraw()
 
-def downArrow(args): 
-    return 
+def keyDown(e):
+    global speed
+    if e.keycode == 40:
+        speed = 0.1
+
+def keyUp(e): 
+    global speed
+    if e.keycode == 40:
+        speed = 0.5
 
 def upArrow(args): 
     global brickType
     rotate(brickType) 
+
 ###
 
 ###
@@ -56,6 +63,7 @@ def upArrow(args):
 ###
 def redraw():
     global offset
+    canvas.delete("all")
     if len(squares) >0:
         for s in squares:
             canvas.create_rectangle(s.x,s.y,s.x+s.size,s.y+s.size, fill = "black")
@@ -106,6 +114,16 @@ def createSeven():
 
 def rotateOne(status, block): 
     if status % 2 ==0:
+        block[0].x += block[3].size
+        block[0].y += block[3].size
+        block[2].x -= block[2].size
+        block[2].y -= block[2].size
+        block[3].x -= block[2].size * 2
+        block[3].y += block[2].size * 2
+        for s in block:
+            s.recalculateIndex()
+        
+    else: 
         block[0].x -= block[3].size
         block[0].y -= block[3].size
         block[1] = block[1]
@@ -113,71 +131,198 @@ def rotateOne(status, block):
         block[2].y += block[2].size
         block[3].x += block[2].size * 2
         block[3].y -= block[2].size * 2
-    else: 
-        block[0].x += block[3].size
-        block[0].y += block[3].size
-        block[1] = block[1]
-        block[2].x -= block[2].size
-        block[2].y -= block[2].size
-        block[3].x -= block[2].size * 2
-        block[3].y += block[2].size * 2
+        for s in block:
+            s.recalculateIndex()
+
 
 def rotateTwo(status, block): 
     size = block[0].size
     if status == 0:
-        block[3].x -= size * 2
+        block[3].x -= 2 * size
+        #block[3].y
         block[2].x -= size
         block[2].y += size
+        block[0].x += size
+        block[0].y -= size
+        for s in block:
+            s.recalculateIndex()
+
+    elif status ==1: 
+        #block[3].x += size
+        block[3].y -= 2* size
+        block[2].x -= size
+        block[2].y -= size
+        block[0].x += size 
+        block[0].y += size
+        for s in block:
+            s.recalculateIndex()
+
+    elif status == 2: 
+        block[3].x += 2 * size
+        #block[3].y 
+        block[2].x += size 
+        block[2].y -= size
         block[0].x -= size
         block[0].y += size
+        for s in block:
+            s.recalculateIndex()
+
+    else: 
+        #block[3].x 
+        block[3].y += 2 * size
+        block[2].x += size 
+        block[2].y += size
+        block[0].x -= size
+        block[0].y -= size
+        for s in block:
+            s.recalculateIndex()
+
+def rotateThree(status, block): 
+    size = block[0].size
+    if status == 0:
+        block[3].x -= size
+        block[3].y -= size
+        block[2].x -= size
+        block[2].y += size
+        block[0].x += size
+        block[0].y -= size
+        for s in block:
+            s.recalculateIndex()
+
     elif status ==1: 
-        block[3].y -= size * 2
+        block[3].x += size
+        block[3].y -= size
         block[2].x -= size
         block[2].y -= size
         block[0].x += size
-        block[0].y += size 
+        block[0].y += size
+        for s in block:
+            s.recalculateIndex()
+
     elif status == 2: 
-        block[3].x += size * 2
+        block[3].x += size
+        block[3].y += size
+        block[2].x += size
+        block[2].y -=size 
+        block[0].x -= size
+        block[0].y += size
+        for s in block:
+            s.recalculateIndex()
+
+    else: 
+        block[3].x -= size
+        block[3].y += size
         block[2].x += size
         block[2].y += size
         block[0].x -= size
-        block[0].y += size  
-    else: 
-        block[3].y += size * 2
-        block[2].x += size
-        block[2].y += size
-        block[0].x -= size
-        block[0].y -= size 
-def rotateThree(status, block): 
-    if status == 0:
-        pass
-    elif status ==1: 
-        pass 
-    elif status == 2: 
-        pass 
-    else: 
-        pass
+        block[0].y -= size
+        for s in block:
+            s.recalculateIndex()
+
 def rotateFour(status, block): 
     return
 def rotateFive(status, block): 
+    size = block[0].size
     if status == 0:
-        pass
+        #block[3].x
+        block[3].y -= 2 * size
+        block[2].x -= size
+        block[2].y += size
+        #block[1].x 
+        #block[1].y
+        block[0].x += size
+        block[0].y -= size
+        for s in block:
+            s.recalculateIndex()
+
     elif status ==1: 
-        pass 
+        block[3].x += 2 * size
+        #block[3].y
+        block[2].x -= size
+        block[2].y -= size
+        #block[1].x
+        #block[1].y
+        block[0].x += size
+        block[0].y += size
+        for s in block:
+            s.recalculateIndex()
+
     elif status == 2: 
-        pass 
+        #block[3].x
+        block[3].y += 2 * size
+        block[2].x += size
+        block[2].y -= size
+        #block[1].x
+        #block[1].y
+        block[0].x -= size
+        block[0].y += size
+        for s in block:
+            s.recalculateIndex()
+
     else: 
-        pass
+        block[3].x -= 2 * size
+        #block[3].y
+        block[2].x += size
+        block[2].y += size
+        #block[1].x
+        #block[1].y
+        block[0].x -= size
+        block[0].y -= size
+        for s in block:
+            s.recalculateIndex()
+
 def rotateSix(status, block): 
+    size = block[0].size
     if status % 2 ==0:
-        pass
+        block[3].x -= size
+        #block[3].y 
+        #block[2].x  
+        block[2].y -= size 
+        block[1].x += size
+        #block[1].y
+        block[0].x += 2* size
+        block[0].y -= size
+        for s in block:
+            s.recalculateIndex()
+
     else: 
-       pass 
+        block[3].x += size
+        #block[3].y 
+        #block[2].x  
+        block[2].y += size 
+        block[1].x -= size
+        #block[1].y
+        block[0].x -= 2* size
+        block[0].y += size 
+        for s in block:
+            s.recalculateIndex()
+
 def rotateSeven(status, block): 
+    size = block[0].size
     if status % 2 ==0:
-        pass
+        #block[3].x
+        block[3].y += size
+        #block[2].x
+        block[2].y -= size
+        block[1].x += size
+        #block[1].y
+        block[0].x += size
+        block[0].y -= 2 * size
+        for s in block:
+            s.recalculateIndex()
+
     else: 
-        pass
+        #block[3].x
+        block[3].y -= size
+        #block[2].x
+        block[2].y += size
+        block[1].x -= size
+        #block[1].y
+        block[0].x -= size
+        block[0].y += 2 * size
+        for s in block:
+            s.recalculateIndex()
+
 ### 
 
 def generate(brickType): 
@@ -207,10 +352,13 @@ def rotate(brickType):
         7: rotateSeven
         }
     newSq = switcher.get(brickType, lambda: "invalid")
+    newSq(rotStatus, squares[-offset:])
+    print(rotStatus)
     rotStatus += 1
+    
     if rotStatus >= 4:
         rotStatus = 0
-    newSq(rotStatus, squares[-offset:])
+    
     
 
 
@@ -220,7 +368,6 @@ def buttonPressed():
     global rotStatus
     global brickType
     rotStatus = 0
-    # if ground contains full line -> delete squares in line
     brickType = nextBrick
     brickSq, offset = generate(nextBrick)
     nextBrick = random.randint(1,7)
@@ -229,6 +376,7 @@ def buttonPressed():
     redraw()
 
 def timerTick(): 
+    global speed
     while True:
         if len(squares) >0:
             wasCollision = False
@@ -243,14 +391,14 @@ def timerTick():
                 for s in squares[-offset:]:
                     s.y += s.size
                     s.index[1]+=1
-            canvas.delete("all")
             redraw()
-            time.sleep(0.5)
+            time.sleep(speed)
 
 ###
 
 groundWidth = 10 
-groundHeight = 25
+groundHeight = 20
+speed = 0.5
 
 form = Tk()
 ground = [[False]*groundWidth for i in range(groundHeight)]
@@ -260,7 +408,8 @@ b.pack()
 canvas = Canvas(form, width=500, height = 500)
 form.bind("<Left>", leftArrow)
 form.bind("<Right>", rightArrow)
-form.bind("<Down>",downArrow)
+form.bind("<KeyPress>", keyDown)
+form.bind("<KeyRelease>", keyUp)
 form.bind("<Up>", upArrow)
 canvas.pack()
 squares = []
