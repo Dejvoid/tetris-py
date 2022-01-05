@@ -1,3 +1,8 @@
+﻿
+# Tetris
+# Autor: David Hřivna, I. ročník
+# zimní semestr 2021/2
+# Programování 1 NPRG030
 
 from tkinter import * 
 import random
@@ -50,7 +55,7 @@ def rightArrow(args): # Moves the brick to the right if possible
 def keyDown(e): # Checks for DownArrow key and speeds up "gravity" on press
     global speed
     if e.keycode == 40:
-        speed = 0.1
+        speed = 0.05
 def keyUp(e): # Checks for DownArrow key and slows down "gravity" on release
     global speed
     if e.keycode == 40:
