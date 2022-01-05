@@ -319,17 +319,25 @@ def timerTick(): # Game loop function
     while True:
         if len(squares) >0:
             wasCollision = False
-            for s in squares[-offset:]:
-                if s.index[1]+1 == groundHeight or ground[s.index[1]+1][s.index[0]]:
+            for j in range(-offset,0):
+                if squares[j].index[1]+1 == groundHeight or ground[squares[j].index[1]+1][squares[j].index[0]]:
                     wasCollision = True
             if wasCollision:
-                for s in squares[-offset:]:
-                    ground[s.index[1]][s.index[0]] = True
+                for i in range(-offset,0):
+                    ground[squares[i].index[1]][squares[i].index[0]] = True
                 buttonPressed()
             else: 
-                for s in squares[-offset:]:
-                    s.y += s.size
-                    s.index[1]+=1
+                for i in range(-offset,0):
+                    squares[i].y += squares[i].size
+                    squares[i].index[1]+=1
+            for i in range(groundHeight-1,-1,-1):
+                wasFull = True
+                for x in ground[i]:
+                    if not x:
+                        wasFull = False
+                if wasFull:
+                    for j in range(i,groundHeight-1):
+                        ground[j] = ground[j+1]
             redraw()
             time.sleep(speed)
 ###
