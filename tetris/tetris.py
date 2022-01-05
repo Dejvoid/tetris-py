@@ -116,7 +116,6 @@ def rotateOne(status, block):
         block[3].y += block[2].size * 2
         for s in block:
             s.recalculateIndex()
-        
     else: 
         block[0].x -= block[3].size
         block[0].y -= block[3].size
@@ -131,16 +130,13 @@ def rotateTwo(status, block):
     size = block[0].size
     if status == 0:
         block[3].x -= 2 * size
-        #block[3].y
         block[2].x -= size
         block[2].y += size
         block[0].x += size
         block[0].y -= size
         for s in block:
             s.recalculateIndex()
-
     elif status ==1: 
-        #block[3].x += size
         block[3].y -= 2* size
         block[2].x -= size
         block[2].y -= size
@@ -148,19 +144,15 @@ def rotateTwo(status, block):
         block[0].y += size
         for s in block:
             s.recalculateIndex()
-
     elif status == 2: 
         block[3].x += 2 * size
-        #block[3].y 
         block[2].x += size 
         block[2].y -= size
         block[0].x -= size
         block[0].y += size
         for s in block:
             s.recalculateIndex()
-
     else: 
-        #block[3].x 
         block[3].y += 2 * size
         block[2].x += size 
         block[2].y += size
@@ -179,7 +171,6 @@ def rotateThree(status, block):
         block[0].y -= size
         for s in block:
             s.recalculateIndex()
-
     elif status ==1: 
         block[3].x += size
         block[3].y -= size
@@ -189,7 +180,6 @@ def rotateThree(status, block):
         block[0].y += size
         for s in block:
             s.recalculateIndex()
-
     elif status == 2: 
         block[3].x += size
         block[3].y += size
@@ -199,7 +189,6 @@ def rotateThree(status, block):
         block[0].y += size
         for s in block:
             s.recalculateIndex()
-
     else: 
         block[3].x -= size
         block[3].y += size
@@ -214,48 +203,33 @@ def rotateFour(status, block):
 def rotateFive(status, block): 
     size = block[0].size
     if status == 0:
-        #block[3].x
         block[3].y -= 2 * size
         block[2].x -= size
         block[2].y += size
-        #block[1].x 
-        #block[1].y
         block[0].x += size
         block[0].y -= size
         for s in block:
             s.recalculateIndex()
-
     elif status ==1: 
         block[3].x += 2 * size
-        #block[3].y
         block[2].x -= size
         block[2].y -= size
-        #block[1].x
-        #block[1].y
         block[0].x += size
         block[0].y += size
         for s in block:
             s.recalculateIndex()
-
     elif status == 2: 
-        #block[3].x
         block[3].y += 2 * size
         block[2].x += size
         block[2].y -= size
-        #block[1].x
-        #block[1].y
         block[0].x -= size
         block[0].y += size
         for s in block:
             s.recalculateIndex()
-
     else: 
         block[3].x -= 2 * size
-        #block[3].y
         block[2].x += size
         block[2].y += size
-        #block[1].x
-        #block[1].y
         block[0].x -= size
         block[0].y -= size
         for s in block:
@@ -264,23 +238,16 @@ def rotateSix(status, block):
     size = block[0].size
     if status % 2 ==0:
         block[3].x -= size
-        #block[3].y 
-        #block[2].x  
         block[2].y -= size 
         block[1].x += size
-        #block[1].y
         block[0].x += 2* size
         block[0].y -= size
         for s in block:
             s.recalculateIndex()
-
     else: 
         block[3].x += size
-        #block[3].y 
-        #block[2].x  
         block[2].y += size 
         block[1].x -= size
-        #block[1].y
         block[0].x -= 2* size
         block[0].y += size 
         for s in block:
@@ -288,12 +255,9 @@ def rotateSix(status, block):
 def rotateSeven(status, block): 
     size = block[0].size
     if status % 2 ==0:
-        #block[3].x
         block[3].y += size
-        #block[2].x
         block[2].y -= size
         block[1].x += size
-        #block[1].y
         block[0].x += size
         block[0].y -= 2 * size
         for s in block:
@@ -365,7 +329,6 @@ def timerTick(): # Game loop function
             time.sleep(speed)
 ###
 
-
 # Start point of program/initialization
 groundWidth = 10 
 groundHeight = 20
@@ -382,7 +345,6 @@ form.bind("<KeyRelease>", keyUp)
 form.bind("<Up>", upArrow)
 canvas.pack()
 squares = []
-t = threading.Timer(0.5,timerTick)
 t = threading.Thread(None, timerTick)
 t.start()
 brickType = random.randint(1,7)
