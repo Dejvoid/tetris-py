@@ -28,28 +28,24 @@ class Square:
 ###
 def leftArrow(args): # Moves the brick to the left if possible
     wasCollision = False
-    if len(squares) >0:
-        for i in range(-offset,0):
-            s = squares[i]
-            if s.index[0]-1 < 0 or ground[s.index[1]][s.index[0]-1]:
-                wasCollision = True
-        if not wasCollision:
-            for i in range(-offset,0):
-                squares[i].x -= squares[i].size
-                squares[i].index[0] -= 1
+    for s in brick: 
+        if s.index[0]-1 < 0 or ground[s.index[1]][s.index[0]-1]:
+            wasCollision = True
+    if not wasCollision:
+        for s in brick:
+            s.x -= s.size
+            s.index[0] -= 1
     redraw()
 
 def rightArrow(args): # Moves the brick to the right if possible
     wasCollision = False
-    if len(squares) >0:
-        for i in range(-offset,0):
-            s = squares[i]
-            if s.index[0]+1 >= groundWidth or ground[s.index[1]][s.index[0]+1]:
-                wasCollision = True
-        if not wasCollision:
-            for i in range(-offset,0):
-                squares[i].x += squares[i].size
-                squares[i].index[0] += 1
+    for s in brick:
+        if s.index[0]+1 >= groundWidth or ground[s.index[1]][s.index[0]+1]:
+            wasCollision = True
+    if not wasCollision:
+        for s in brick:
+            s.x += s.size
+            s.index[0] += 1
     redraw()
 
 def keyDown(e): # Checks for DownArrow key and speeds up "gravity" on press
@@ -64,16 +60,14 @@ def upArrow(args): # On UpArrow key pressed rotates the brick
     global brickType
     rotate(brickType) 
 def buttonPressed(): # Start button function (Game start)
-    global offset
     global nextBrick
     global rotStatus
     global brickType
+    global brick
     rotStatus = 0
     brickType = nextBrick
-    brickSq, offset = generate(nextBrick)
+    brick = generate(nextBrick)
     nextBrick = random.randint(1,7)
-    for s in brickSq:
-        squares.append(s)
     redraw()
 ###
 
@@ -81,13 +75,14 @@ def buttonPressed(): # Start button function (Game start)
 # Graphics Functions
 ###
 def redraw(): # Draws individual squares on canvas
-    global offset
+    global brick
     canvas.delete("all")
-    if len(squares) >0:
-        for i in range(0,len(squares)-offset):
-            canvas.create_rectangle(squares[i].x,squares[i].y,squares[i].x+squares[i].size,squares[i].y+squares[i].size, fill = "black")
-        for i in range(-offset,0):
-            canvas.create_rectangle(squares[i].x,squares[i].y,squares[i].x+squares[i].size,squares[i].y+squares[i].size, fill = "red")
+    for line in ground:
+        for s in line:
+            if s != None:
+                canvas.create_rectangle(s.x,s.y,s.x+s.size,s.y+s.size, fill = "black")
+    for s in brick:
+        canvas.create_rectangle(s.x,s.y,s.x+s.size,s.y+s.size, fill = "red")
     canvas.update()
 ### 
 
@@ -295,7 +290,7 @@ def generate(brickType):
         7: createSeven
         }
     brickSquares = switcher.get(brickType, lambda: "InvalidBrick")
-    return brickSquares(), len(brickSquares())
+    return brickSquares()
 def rotate(brickType):
     global rotStatus
     switcher ={ 
@@ -308,7 +303,7 @@ def rotate(brickType):
         7: rotateSeven
         }
     newSq = switcher.get(brickType, lambda: "invalid")
-    newSq(rotStatus, squares[-offset:])
+    newSq(rotStatus, brick)
     print(rotStatus)
     rotStatus += 1
     
@@ -317,37 +312,42 @@ def rotate(brickType):
 def timerTick(): # Game loop function
     global speed
     while True:
-        if len(squares) >0:
-            wasCollision = False
-            for j in range(-offset,0):
-                if squares[j].index[1]+1 == groundHeight or ground[squares[j].index[1]+1][squares[j].index[0]]:
-                    wasCollision = True
-            if wasCollision:
-                for i in range(-offset,0):
-                    ground[squares[i].index[1]][squares[i].index[0]] = True
-                buttonPressed()
-            else: 
-                for i in range(-offset,0):
-                    squares[i].y += squares[i].size
-                    squares[i].index[1]+=1
-            for i in range(groundHeight-1,-1,-1):
-                wasFull = True
-                for x in ground[i]:
-                    if not x:
-                        wasFull = False
-                if wasFull:
-                    for j in range(i,groundHeight-1):
-                        ground[j] = ground[j+1]
-            redraw()
-            time.sleep(speed)
+        wasCollision = False
+        for s in brick: 
+            if s.index[1]+1 == groundHeight or ground[s.index[1]+1][s.index[0]]!= None:
+                wasCollision = True
+        if wasCollision:
+            for s in brick: 
+                ground[s.index[1]][s.index[0]] = s
+            buttonPressed()
+        else: 
+            for s in brick:
+                s.y += s.size
+                s.index[1]+=1
+        for i in range(groundHeight-1,-1,-1):
+            wasFull = True
+            for x in ground[i]:
+                if x== None:
+                    wasFull = False
+            if wasFull:
+                for j in range(i,0,-1):
+                    ground[j] = ground[j-1]
+                    for s in ground[j]:
+                        if s != None: 
+                            s.y += s.size 
+                            s.recalculateIndex()
+                i += 1
+        redraw()
+        time.sleep(speed)
 ###
 
 # Start point of program/initialization
 groundWidth = 10 
 groundHeight = 20
 speed = 0.5
+brick = []
 form = Tk()
-ground = [[False]*groundWidth for i in range(groundHeight)] # representation of playground ()
+ground = [[None]*groundWidth for i in range(groundHeight)] # representation of playground ()
 b = Button(form, text="Start", command = buttonPressed)
 b.pack()
 canvas = Canvas(form, width=500, height = 500)
@@ -357,7 +357,6 @@ form.bind("<KeyPress>", keyDown)
 form.bind("<KeyRelease>", keyUp)
 form.bind("<Up>", upArrow)
 canvas.pack()
-squares = []
 t = threading.Thread(None, timerTick)
 t.start()
 brickType = random.randint(1,7)
