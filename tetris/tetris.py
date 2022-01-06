@@ -8,6 +8,7 @@ from tkinter import *
 import random
 import time 
 import threading
+from tkinter import messagebox
 
 # Class representation of squares of the individual bricks
 class Square: 
@@ -60,15 +61,14 @@ def upArrow(args): # On UpArrow key pressed rotates the brick
     global brickType
     rotate(brickType) 
 def buttonPressed(): # Start button function (Game start)
-    global nextBrick
-    global rotStatus
-    global brickType
-    global brick
-    rotStatus = 0
-    brickType = nextBrick
-    brick = generate(nextBrick)
-    nextBrick = random.randint(1,7)
-    redraw()
+    global ground
+    global speed
+    ground = [[None]*groundWidth for i in range(groundHeight)]
+    t = threading.Thread(None, timerTick)
+    speed = 0.5
+    t.start()
+    spawnBrick()
+    b["state"] = "disabled"
 ###
 
 ###
@@ -77,6 +77,10 @@ def buttonPressed(): # Start button function (Game start)
 def redraw(): # Draws individual squares on canvas
     global brick
     canvas.delete("all")
+    canvas.create_line(10,10,10,210,width=2, fill= "black")
+    canvas.create_line(10,10,110,10,width=2, fill= "black")
+    canvas.create_line(10,210,110,210,width=2, fill= "black")
+    canvas.create_line(110,10,110,210,width=2, fill= "black")
     for line in ground:
         for s in line:
             if s != None:
@@ -91,18 +95,31 @@ def redraw(): # Draws individual squares on canvas
 ###
 # Create methods - generating individual bricks
 def createOne():
+    # |0|1|2|3|
     return [Square(10,10,10),Square(20,10,10),Square(30,10,10),Square(40,10,10)] 
 def createTwo(): 
+    # |0|1|2|
+    #     |3|
     return [Square(10,10,10), Square(20,10,10), Square(30,10,10), Square(30,20,10)]
 def createThree(): 
+    # |0|1|2|
+    #   |3|
     return [Square(10,10,10), Square(20,10,10), Square(30,10,10), Square(20,20,10)]
-def createFour(): 
+def createFour():
+    # |0|1|
+    # |1|3|
     return [Square(10,10,10), Square(20,10,10), Square(10,20,10), Square(20,20,10)] 
 def createFive(): 
+    # |0|1|2|
+    # |3|
     return [Square(10,10,10), Square(20,10,10), Square(30,10,10), Square(10,20,10)] 
 def createSix(): 
+    # |0|1|
+    #   |2|3|
     return [Square(10,10,10), Square(20,10,10), Square(20,20,10), Square(30,20,10)] 
 def createSeven(): 
+    #   |1|3|
+    # |0|2|
     return [Square(10,20,10), Square(20,10,10), Square(20,20,10), Square(30,10,10)]
 
 # Rotate methods - rotates individual bricks
@@ -114,8 +131,6 @@ def rotateOne(status, block):
         block[2].y -= block[2].size
         block[3].x -= block[2].size * 2
         block[3].y += block[2].size * 2
-        for s in block:
-            s.recalculateIndex()
     else: 
         block[0].x -= block[3].size
         block[0].y -= block[3].size
@@ -124,7 +139,13 @@ def rotateOne(status, block):
         block[2].y += block[2].size
         block[3].x += block[2].size * 2
         block[3].y -= block[2].size * 2
-        for s in block:
+        if block[0].x < 10:
+            for s in block:
+                s.x += 10
+        elif block[3].x > 10*(groundWidth):
+            for s in block:
+                s.x += 10*(groundWidth) - block[3].x
+    for s in block:
             s.recalculateIndex()
 def rotateTwo(status, block): 
     size = block[0].size
@@ -134,32 +155,32 @@ def rotateTwo(status, block):
         block[2].y += size
         block[0].x += size
         block[0].y -= size
-        for s in block:
-            s.recalculateIndex()
     elif status ==1: 
         block[3].y -= 2* size
         block[2].x -= size
         block[2].y -= size
         block[0].x += size 
         block[0].y += size
-        for s in block:
-            s.recalculateIndex()
+        if block[0].x > 10*(groundWidth):
+            for s in block:
+                s.x -= 10
     elif status == 2: 
         block[3].x += 2 * size
         block[2].x += size 
         block[2].y -= size
         block[0].x -= size
         block[0].y += size
-        for s in block:
-            s.recalculateIndex()
     else: 
         block[3].y += 2 * size
         block[2].x += size 
         block[2].y += size
         block[0].x -= size
         block[0].y -= size
-        for s in block:
-            s.recalculateIndex()
+        if block[0].x < 10:
+            for s in block:
+                s.x += 10
+    for s in block:
+           s.recalculateIndex()
 def rotateThree(status, block): 
     size = block[0].size
     if status == 0:
@@ -169,8 +190,6 @@ def rotateThree(status, block):
         block[2].y += size
         block[0].x += size
         block[0].y -= size
-        for s in block:
-            s.recalculateIndex()
     elif status ==1: 
         block[3].x += size
         block[3].y -= size
@@ -178,8 +197,9 @@ def rotateThree(status, block):
         block[2].y -= size
         block[0].x += size
         block[0].y += size
-        for s in block:
-            s.recalculateIndex()
+        if block[0].x > 10*(groundWidth):
+            for s in block:
+                s.x -= 10
     elif status == 2: 
         block[3].x += size
         block[3].y += size
@@ -187,8 +207,6 @@ def rotateThree(status, block):
         block[2].y -=size 
         block[0].x -= size
         block[0].y += size
-        for s in block:
-            s.recalculateIndex()
     else: 
         block[3].x -= size
         block[3].y += size
@@ -196,7 +214,10 @@ def rotateThree(status, block):
         block[2].y += size
         block[0].x -= size
         block[0].y -= size
-        for s in block:
+        if block[0].x < 10:
+            for s in block:
+                s.x += 10
+    for s in block:
             s.recalculateIndex()
 def rotateFour(status, block): 
     return
@@ -208,32 +229,32 @@ def rotateFive(status, block):
         block[2].y += size
         block[0].x += size
         block[0].y -= size
-        for s in block:
-            s.recalculateIndex()
     elif status ==1: 
         block[3].x += 2 * size
         block[2].x -= size
         block[2].y -= size
         block[0].x += size
         block[0].y += size
-        for s in block:
-            s.recalculateIndex()
+        if block[0].x > 10*(groundWidth):
+            for s in block:
+                s.x -= 10
     elif status == 2: 
         block[3].y += 2 * size
         block[2].x += size
         block[2].y -= size
         block[0].x -= size
         block[0].y += size
-        for s in block:
-            s.recalculateIndex()
     else: 
         block[3].x -= 2 * size
         block[2].x += size
         block[2].y += size
         block[0].x -= size
         block[0].y -= size
-        for s in block:
-            s.recalculateIndex()
+        if block[0].x < 10:
+            for s in block:
+                s.x += 10
+    for s in block:
+        s.recalculateIndex()
 def rotateSix(status, block): 
     size = block[0].size
     if status % 2 ==0:
@@ -242,15 +263,16 @@ def rotateSix(status, block):
         block[1].x += size
         block[0].x += 2* size
         block[0].y -= size
-        for s in block:
-            s.recalculateIndex()
     else: 
         block[3].x += size
         block[2].y += size 
         block[1].x -= size
         block[0].x -= 2* size
         block[0].y += size 
-        for s in block:
+        if block[0].x < 10:
+            for s in block:
+                s.x += 10
+    for s in block:
             s.recalculateIndex()
 def rotateSeven(status, block): 
     size = block[0].size
@@ -260,25 +282,23 @@ def rotateSeven(status, block):
         block[1].x += size
         block[0].x += size
         block[0].y -= 2 * size
-        for s in block:
-            s.recalculateIndex()
-
     else: 
-        #block[3].x
         block[3].y -= size
-        #block[2].x
         block[2].y += size
         block[1].x -= size
-        #block[1].y
         block[0].x -= size
         block[0].y += 2 * size
-        for s in block:
-            s.recalculateIndex()
+        if block[0].x < 10:
+            for s in block:
+                s.x += 10
+    for s in block:
+        s.recalculateIndex()
 ### 
 
 ###
 # Game Logic functions 
 ###
+
 def generate(brickType): 
     switcher ={ 
         1: createOne, 
@@ -309,6 +329,16 @@ def rotate(brickType):
     
     if rotStatus >= 4:
         rotStatus = 0
+def spawnBrick():
+    global nextBrick
+    global rotStatus
+    global brickType
+    global brick
+    rotStatus = 0
+    brickType = nextBrick
+    brick = generate(nextBrick)
+    nextBrick = random.randint(1,7)
+    redraw()
 def timerTick(): # Game loop function
     global speed
     while True:
@@ -319,7 +349,7 @@ def timerTick(): # Game loop function
         if wasCollision:
             for s in brick: 
                 ground[s.index[1]][s.index[0]] = s
-            buttonPressed()
+            spawnBrick()
         else: 
             for s in brick:
                 s.y += s.size
@@ -337,6 +367,15 @@ def timerTick(): # Game loop function
                             s.y += s.size 
                             s.recalculateIndex()
                 i += 1
+        lost = False
+        for x in ground[0]:
+            if x != None:
+                lost = True
+        if lost:
+            print("you lost")
+            messagebox.showwarning("You lost!", "You lost! \nPress start to play again")
+            b["state"] = "normal"
+            return 
         redraw()
         time.sleep(speed)
 ###
@@ -345,9 +384,9 @@ def timerTick(): # Game loop function
 groundWidth = 10 
 groundHeight = 20
 speed = 0.5
-brick = []
-form = Tk()
-ground = [[None]*groundWidth for i in range(groundHeight)] # representation of playground ()
+brick = [] # represents brick moved by user
+form = Tk("Tetris")
+ground = [[None]*groundWidth for i in range(groundHeight)] # representation of playground
 b = Button(form, text="Start", command = buttonPressed)
 b.pack()
 canvas = Canvas(form, width=500, height = 500)
@@ -357,9 +396,7 @@ form.bind("<KeyPress>", keyDown)
 form.bind("<KeyRelease>", keyUp)
 form.bind("<Up>", upArrow)
 canvas.pack()
-t = threading.Thread(None, timerTick)
-t.start()
 brickType = random.randint(1,7)
 nextBrick = random.randint(1,7)
-rotStatus = 0
+rotStatus = 0 # rotation of brick
 form.mainloop()
