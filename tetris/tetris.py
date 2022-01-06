@@ -358,7 +358,7 @@ def timerTick(): # Game loop function
                 if x== None:
                     wasFull = False
             if wasFull:
-                for j in range(i,0,-1):
+                for j in range(i,0,-1): # error nekde tady, kdyz hraju, tak to posouva spatne, takze prohraju, kdyz nemam
                     ground[j] = ground[j-1]
                     for s in ground[j]:
                         if s != None: 
