@@ -37,7 +37,6 @@ def leftArrow(args): # Moves the brick to the left if possible
             s.x -= s.size
             s.index[0] -= 1
     redraw()
-
 def rightArrow(args): # Moves the brick to the right if possible
     wasCollision = False
     for s in brick:
@@ -48,7 +47,6 @@ def rightArrow(args): # Moves the brick to the right if possible
             s.x += s.size
             s.index[0] += 1
     redraw()
-
 def keyDown(e): # Checks for DownArrow key and speeds up "gravity" on press
     global speed
     if e.keycode == 40:
@@ -63,11 +61,11 @@ def upArrow(args): # On UpArrow key pressed rotates the brick
 def buttonPressed(): # Start button function (Game start)
     global ground
     global speed
-    ground = [[None]*groundWidth for i in range(groundHeight)]
+    ground = [[None]*groundWidth for i in range(groundHeight)] # 
     t = threading.Thread(None, timerTick)
     speed = 0.5
-    t.start()
     spawnBrick()
+    t.start() # start of "game loop"
     b["state"] = "disabled"
 ###
 
@@ -385,7 +383,8 @@ groundWidth = 10
 groundHeight = 20
 speed = 0.5
 brick = [] # represents brick moved by user
-form = Tk("Tetris")
+form = Tk()
+form.title("Tetris")
 ground = [[None]*groundWidth for i in range(groundHeight)] # representation of playground
 b = Button(form, text="Start", command = buttonPressed)
 b.pack()
