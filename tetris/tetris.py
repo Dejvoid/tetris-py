@@ -365,6 +365,13 @@ def timerTick(): # Game loop function
                             s.y += s.size 
                             s.recalculateIndex()
                 i += 1
+                for y in range(groundHeight):
+                    for x in range(groundWidth):
+                        if ground[y][x] != None:
+                            print("1", end="")
+                        else: 
+                            print("0", end="")
+                    print()
         lost = False
         for x in ground[0]:
             if x != None:

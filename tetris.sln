@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "tetris", "tetris\tetris.pyproj", "{0541E98A-51D8-4220-BC6F-5DFA8DC84B3A}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "tetris-pyGame", "tetris-pyGame\tetris-pyGame.pyproj", "{14071E8C-65A4-4EA1-9810-B2A87FDB0AF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0541E98A-51D8-4220-BC6F-5DFA8DC84B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0541E98A-51D8-4220-BC6F-5DFA8DC84B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14071E8C-65A4-4EA1-9810-B2A87FDB0AF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14071E8C-65A4-4EA1-9810-B2A87FDB0AF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
