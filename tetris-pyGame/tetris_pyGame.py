@@ -4,7 +4,8 @@
 # Import and initialize the pygame library
 from math import fabs
 import random
-import pygame 
+import pygame
+from pygame.constants import SYSTEM_CURSOR_IBEAM 
 from Square import Square
 
 
@@ -27,6 +28,14 @@ def checkMove():
         brickType = nextBrick
         brick = generate(nextBrick)
         nextBrick = random.randint(1,7)
+        for y in range(groundHeight):
+                for x in range(groundWidth):
+                    if ground[y][x] != None:
+                        print("1", end="")
+                    else: 
+                        print("0", end="")
+                print()
+        print()
     else: 
         for s in brick:
             s.y += s.size
@@ -51,6 +60,8 @@ def checkMove():
                     else: 
                         print("0", end="")
                 print()
+            print()
+    
     lost = False
     for x in ground[0]:
         if x != None:
@@ -60,6 +71,7 @@ def checkMove():
         messagebox.showwarning("You lost!", "You lost! \nPress start to play again")
         b["state"] = "normal"
         return 
+    
 
 # Create methods - generating individual bricks
 def createOne():
@@ -314,13 +326,11 @@ def rotate(brickType):
     if rotStatus >= 4:
         rotStatus = 0
 
-
-
-
 pygame.init()
 
 # Set up the drawing window
 screen = pygame.display.set_mode([600, 800])
+
 
 groundWidth = 10
 groundHeight = 20
