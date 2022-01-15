@@ -345,6 +345,10 @@ squareSize = 25
 paused = False
 
 brick = generate(brickType)
+pygame.font.init()
+myfont = pygame.font.SysFont('Comic Sans MS', 30)
+
+controlsText = ["Controls:","UpArrow: Rotate","DownArrow: Speed Up", "LeftArrow: Move left", "RightArrow: Move right","ESC: Pause", "Space: Start Game"]
 
 running = True
 counter = 0
@@ -373,8 +377,13 @@ while running:
         if counter % 100 == 0: # Used to reduce speed
             rightKey(brick,ground) 
 
-    if paused:
-        pygame.draw.rect(screen,(0,0,0), (0,0,100,100))
+    if paused: # Shows the game is paused
+        pygame.draw.rect(screen,(0,0,0), (squareSize,squareSize+groundHeight*squareSize//4,groundWidth*squareSize+100,groundHeight*squareSize//4))
+        textsurface = myfont.render('Game paused!', False, (0, 255, 255))
+        screen.blit(textsurface,(squareSize,squareSize+groundHeight*squareSize//4))
+        textsurface2 = myfont.render('Press ESC to continue', False, (0, 255, 255))
+        screen.blit(textsurface2,(squareSize,squareSize+groundHeight*squareSize//4+30))
+
     else: 
         if counter % speed== 0: # Applies "gravity" on brick in certain frames based on speed
             checkMove()
@@ -391,6 +400,11 @@ while running:
                 if ground[y][x] != None:
                     s = ground[y][x]
                     pygame.draw.rect(screen,(0,0,0), (s.x,s.y,s.size,s.size))
+    # Draws controlls
+    for x in range(0,len(controlsText)*30,30):
+        textsurface = myfont.render(controlsText[x//30], False, (0, 0, 0))
+        screen.blit(textsurface,(squareSize+groundWidth*squareSize,squareSize+x))
+
     pygame.display.flip()
     counter += 1
 pygame.quit()
