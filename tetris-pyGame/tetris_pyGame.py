@@ -1,5 +1,8 @@
-
-# Simple pygame program
+﻿
+# Tetris - Semester Assignment
+# Author: David Hřivna, I. year
+# Winter semester 2021/2022
+# Subject: NPRG30
 
 # Import and initialize the pygame library
 from math import fabs
@@ -8,7 +11,7 @@ import pygame
 from pygame.constants import SYSTEM_CURSOR_IBEAM 
 from Square import Square
 
-
+# This method is used to check validity of the brick move. Checks for collisions, full rows, loss.
 def checkMove():
     global nextBrick
     global brick
@@ -45,8 +48,8 @@ def checkMove():
         for x in range(groundWidth):
             if ground[i][x]== None:
                 wasFull = False
-        if wasFull:
-            for j in range(i,0,-1): # error nekde tady, kdyz hraju, tak to posouva spatne, takze prohraju, kdyz nemam
+        if wasFull: 
+            for j in range(i,0,-1):
                 ground[j] = ground[j-1]
                 for s in ground[j]:
                     if s != None: 
@@ -71,7 +74,6 @@ def checkMove():
         messagebox.showwarning("You lost!", "You lost! \nPress start to play again")
         b["state"] = "normal"
         return 
-    
 
 # Create methods - generating individual bricks
 def createOne():
@@ -273,8 +275,8 @@ def rotateSeven(status, block):
                 s.x += squareSize
     for s in block:
         s.recalculateIndex()
-### 
 
+# Moves the brick to the left
 def leftKey(brick, ground): 
     wasCollision = False
     for s in brick: 
@@ -284,6 +286,7 @@ def leftKey(brick, ground):
         for s in brick:
             s.x -= s.size
             s.index[0] -= 1
+# Moves the brick to the right
 def rightKey(brick, ground):
     wasCollision = False
     for s in brick:
@@ -293,8 +296,25 @@ def rightKey(brick, ground):
         for s in brick:
             s.x += s.size
             s.index[0] += 1
-
-
+# Initiates the rotation of the brick
+def rotate(brickType):
+    global rotStatus 
+    switcher ={ 
+        1: rotateOne, 
+        2: rotateTwo, 
+        3: rotateThree, 
+        4: rotateFour, 
+        5: rotateFive, 
+        6: rotateSix, 
+        7: rotateSeven
+        }
+    rotateBrick = switcher.get(brickType, lambda: "invalid")
+    rotateBrick(rotStatus, brick)
+    print(rotStatus)
+    rotStatus += 1
+    if rotStatus >= 4:
+        rotStatus = 0
+# Initiates generating the brick
 def generate(brickType): 
     switcher ={ 
         1: createOne, 
@@ -307,105 +327,70 @@ def generate(brickType):
         }
     brickSquares = switcher.get(brickType, lambda: "InvalidBrick")
     return brickSquares()
-def rotate(brickType):
-    global rotStatus
-    switcher ={ 
-        1: rotateOne, 
-        2: rotateTwo, 
-        3: rotateThree, 
-        4: rotateFour, 
-        5: rotateFive, 
-        6: rotateSix, 
-        7: rotateSeven
-        }
-    newSq = switcher.get(brickType, lambda: "invalid")
-    newSq(rotStatus, brick)
-    print(rotStatus)
-    rotStatus += 1
-    
-    if rotStatus >= 4:
-        rotStatus = 0
 
+
+
+# Program start point
 pygame.init()
-
-# Set up the drawing window
 screen = pygame.display.set_mode([600, 800])
-
-
-groundWidth = 10
-groundHeight = 20
+groundWidth = 10 # Number of squares in row
+groundHeight = 20 # Number of squares in column
 speed = 500 # higher value = slower
-brick = []
-ground = [[None]*groundWidth for i in range(groundHeight)]
+brick = [] # Represents brick manipulated by user
+ground = [[None]*groundWidth for i in range(groundHeight)] # Represents all squares (bricks) in the game
 brickType = random.randint(1,7)
-nextBrick = random.randint(1,7)
-rotStatus = 0 
-squareSize = 25
+nextBrick = random.randint(1,7) # Type of next brick
+rotStatus = 0 # Status of rotation (used in rotation methods)
+squareSize = 25 
 paused = False
 
 brick = generate(brickType)
 
-# Run until the user asks to quit
 running = True
 counter = 0
 while running:
-
-    # Did the user click the window close button?
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN: 
-            #if event.key == pygame.K_LEFT:
-            #    leftKey(brick, ground)
-            #if event.key == pygame.K_RIGHT: 
-            #    rightKey(brick,ground)
-            if event.key == pygame.K_UP: 
+            if event.key == pygame.K_UP: # Up arrow -> Rotate brick
                 rotate(brickType)
-            if event.key == pygame.K_ESCAPE: 
+            if event.key == pygame.K_ESCAPE: # Escape -> pause/unpause the game
                 if paused:
                     paused = False 
                 else: 
                     paused = True
             if event.key == pygame.K_DOWN: 
                 pass
-    if pygame.key.get_pressed()[pygame.K_DOWN]: 
+    if pygame.key.get_pressed()[pygame.K_DOWN]: # Down arrow -> speed up
         speed = 50
     else: 
         speed = 500
-    if pygame.key.get_pressed()[pygame.K_LEFT]: 
-        if counter % 100 == 0:
+    if pygame.key.get_pressed()[pygame.K_LEFT]: # Left arrow -> Move brick to the left
+        if counter % 100 == 0: # Used to reduce speed
             leftKey(brick,ground) 
-    if pygame.key.get_pressed()[pygame.K_RIGHT]:
-        if counter % 100 == 0:
+    if pygame.key.get_pressed()[pygame.K_RIGHT]: # Right arrow -> Move brick to the right
+        if counter % 100 == 0: # Used to reduce speed
             rightKey(brick,ground) 
 
     if paused:
         pygame.draw.rect(screen,(0,0,0), (0,0,100,100))
     else: 
-        if counter % speed== 0:
+        if counter % speed== 0: # Applies "gravity" on brick in certain frames based on speed
             checkMove()
             counter = 0
-
-        # Fill the background with white
+        # Graphic interface
         screen.fill((255, 255, 255))
         pygame.draw.rect(screen, (200,200,200), (squareSize, squareSize,groundWidth*squareSize, groundHeight*squareSize))
+        # Draws the user-controlled brick
         for s in brick: 
             pygame.draw.rect(screen, (255,0,0), (s.x,s.y,s.size,s.size))
-
+        # Draws the rest of the squares in game
         for y in range(groundHeight):
             for x in range(groundWidth): 
                 if ground[y][x] != None:
                     s = ground[y][x]
                     pygame.draw.rect(screen,(0,0,0), (s.x,s.y,s.size,s.size))
-
-        #pygame.draw.rect(screen, (255,0,0),(x,0,squareSize, squareSize))
-
-    # Flip the display
     pygame.display.flip()
-    # moveBrick
-    #pygame.time.delay(speed)
     counter += 1
-
-
-# Done! Time to quit.
 pygame.quit()
