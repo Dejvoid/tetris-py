@@ -383,7 +383,10 @@ while running:
         screen.blit(textsurface,(squareSize,squareSize+groundHeight*squareSize//4))
         textsurface2 = myfont.render('Press ESC to continue', False, (0, 255, 255))
         screen.blit(textsurface2,(squareSize,squareSize+groundHeight*squareSize//4+30))
-
+        # Draws controlls
+        for x in range(0,len(controlsText)*30,30):
+            textsurface = myfont.render(controlsText[x//30], False, (0, 0, 0))
+            screen.blit(textsurface,(squareSize+groundWidth*squareSize,squareSize+x))
     else: 
         if counter % speed== 0: # Applies "gravity" on brick in certain frames based on speed
             checkMove()
@@ -400,10 +403,12 @@ while running:
                 if ground[y][x] != None:
                     s = ground[y][x]
                     pygame.draw.rect(screen,(0,0,0), (s.x,s.y,s.size,s.size))
-    # Draws controlls
-    for x in range(0,len(controlsText)*30,30):
-        textsurface = myfont.render(controlsText[x//30], False, (0, 0, 0))
-        screen.blit(textsurface,(squareSize+groundWidth*squareSize,squareSize+x))
+        # Draws controlls
+        for x in range(0,len(controlsText)*30,30):
+            textsurface = myfont.render(controlsText[x//30], False, (0, 0, 0))
+            screen.blit(textsurface,(squareSize+groundWidth*squareSize,squareSize+x))
+
+    
 
     pygame.display.flip()
     counter += 1
