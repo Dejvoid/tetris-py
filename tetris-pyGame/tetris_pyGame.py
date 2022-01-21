@@ -351,7 +351,7 @@ myfont = pygame.font.SysFont('Comic Sans MS', 30)
 controlsText = ["Controls:","UpArrow: Rotate","DownArrow: Speed Up", "LeftArrow: Move left", "RightArrow: Move right","ESC: Pause", "Space: Start Game"]
 
 running = True
-counter = 0
+counter = 0 # counter used in speed calculations
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
