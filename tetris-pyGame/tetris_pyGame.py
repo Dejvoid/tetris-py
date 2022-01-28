@@ -20,6 +20,8 @@ def checkMove():
     global groundWidth
     global brickType
     global rotStatus
+    global menuString
+    global paused
     wasCollision = False
     for s in brick: 
         if s.index[1]+1 == groundHeight or ground[s.index[1]+1][s.index[0]]!= None:
@@ -71,8 +73,10 @@ def checkMove():
             lost = True
     if lost:
         print("you lost")
-        messagebox.showwarning("You lost!", "You lost! \nPress start to play again")
-        b["state"] = "normal"
+        menuString = "You lost!"
+        paused = True
+        ground = [[None]*groundWidth for i in range(groundHeight)]
+        
         return 
 
 # Create methods - generating individual bricks
@@ -342,7 +346,7 @@ brickType = random.randint(1,7)
 nextBrick = random.randint(1,7) # Type of next brick
 rotStatus = 0 # Status of rotation (used in rotation methods)
 squareSize = 25 
-paused = False
+paused = True
 
 brick = generate(brickType)
 pygame.font.init()
@@ -352,6 +356,7 @@ controlsText = ["Controls:","UpArrow: Rotate","DownArrow: Speed Up", "LeftArrow:
 
 running = True
 counter = 0 # counter used in speed calculations
+menuString = "Game paused"
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -379,7 +384,7 @@ while running:
 
     if paused: # Shows the game is paused
         pygame.draw.rect(screen,(0,0,0), (squareSize,squareSize+groundHeight*squareSize//4,groundWidth*squareSize+100,groundHeight*squareSize//4))
-        textsurface = myfont.render('Game paused!', False, (0, 255, 255))
+        textsurface = myfont.render(menuString, False, (0, 255, 255))
         screen.blit(textsurface,(squareSize,squareSize+groundHeight*squareSize//4))
         textsurface2 = myfont.render('Press ESC to continue', False, (0, 255, 255))
         screen.blit(textsurface2,(squareSize,squareSize+groundHeight*squareSize//4+30))
