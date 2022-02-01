@@ -352,7 +352,7 @@ brick = generate(brickType)
 pygame.font.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 
-controlsText = ["Controls:","UpArrow: Rotate","DownArrow: Speed Up", "LeftArrow: Move left", "RightArrow: Move right","ESC: Pause", "Space: Start Game"]
+controlsText = ["Controls:","UpArrow: Rotate","DownArrow: Speed Up", "LeftArrow: Move left", "RightArrow: Move right","ESC: Pause"]
 
 running = True
 counter = 0 # counter used in speed calculations
