@@ -9,3 +9,6 @@ Locate **tetris_pyGame.py** file and run it with **python** (tested on v3.9). Th
 - **Down Arrow** - Speed up brick falling
 - **Up Arrow** - Rotate brick
 - **ESC** - Pause
+
+## Program structure
+Representation of individual squares is in class in file *Squares.py*. Main game logic (movement of brick, row deletion) is in *checkMove* method. 
